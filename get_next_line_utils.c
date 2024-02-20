@@ -6,105 +6,97 @@
 /*   By: esellier <esellier@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 15:57:11 by esellier          #+#    #+#             */
-/*   Updated: 2024/02/16 17:19:22 by esellier         ###   ########.fr       */
+/*   Updated: 2024/02/20 17:15:21 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-//ssize_t	read(int fd, void *buf, size_t buffer_size)
-unsigned long	ft_buf_cpy(char *stach, char *buf, size_t buffer_size)
+char	*ft_buf_cpy(char *stach, char *buf, int readed)
 {
-	unsigned long	i;
-	unsigned long	j;
-
-	i = ft_strlen(stach);
-	if (stach != NULL)
-	{
-		i++; //--> pour que si c'est les premiers caracteres i commence a zero et ici a +1
-		free (stach); //--> mais ca vide ce qu'il y a deja dedans?
-		stach = malloc(i + buffer_size * sizeof (char));
-		if (!stach)
-			return (0); //si NULL ne compile pas
-	}
+	int		i;
+	int		j;
+	char	*tmp;
+	
+	i = 0;
 	j = 0;
-	while (j <= buffer_size && buffer_size > 0 && stach[i] && buf[i])
+	if (stach)
+		i = ft_strlen(stach);
+	tmp = malloc((readed + i + 1) * sizeof(char));
+	if (!tmp)
+		return (NULL);
+	i = 0;
+	while (stach && stach[i] != '\0')
 	{
-		stach[i] = buf[j];
+		tmp[i] = stach[i];
 		i++;
-		j++;
 	}
-	if (buf[i] == '\n')
-		stach[i] = buf[j];
-	return (buffer_size);
+	while (j < readed)
+		tmp[i++] = buf[j++];
+	tmp[i] = '\0';
+	if (stach)
+	{
+		free (stach);
+		stach = NULL;
+	}
+	stach = tmp; // ca suffit pour copier le tmp? pas besoin de malloc la stach?
+	tmp = NULL;
+	free (tmp); //fait planter la compilation si il n'y a pas la ligne du dessus, mais resultat egale sans ces deux lignes)
+	return (stach);
 }
-
 unsigned long	ft_strlen(char *stach)
 {
 	unsigned long	len;
 
 	len = 0;
-	while (stach[len] != '\n' || stach[len] != '\0')
+	while (stach[len] != '\n' && stach[len] != '\0')
 		len ++;
 	return (len);
 }
-
-/*unsigned long	ft_join_stach(char *stach, char *buf, size_t buffer_size)
-{
-	unsigned long	i;
-
-	i = 0;
-	if (stach[i])
-		i++;
-	if (buf && i > 0)
-		ft_buf_cpy(stach, buf, i, buffer_size);
-	return (0);
-}*/
-
-void	*ft_clean_stach(char *stach, size_t buffer_size)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < buffer_size)
-	{
-		stach[i] = '\0';
-		i++;
-	}
-	return(0);
-}
-
-void	ft_put_buf(char *stach, char *buf, size_t buffer_size)
+char	*ft_end_stach(char *stach)
 {
 	unsigned long	i;
 	unsigned long	j;
+	char	*tmp;
 
 	j = 0;
-	while (buf[j] != '\n')
-		j++;
+	i = ft_strlen(stach); //--> calculer jusqu'au \n
+	tmp = (char *)malloc((i + 2) * sizeof(char));
 	i = 0;
-	if (buf[j] == '\n')
-	{
-		j++;
-		while (j < buffer_size)
-		{
-			stach[i] = buf [j];
-			i++;
-			j++;
-		}
-	}
-	return ;
+	if (stach[j] != '\n')
+		tmp[i++] = stach[j++];
+	tmp[i] = '\n';
+	tmp[i + 1] = '\0'; //--> copier le debut dans la tmp et renvoyer la ligne
+	stach = ft_substr(stach, i); //--> refaire une stach avec ce qui reste de la premiere ligne
+	return (tmp); 
 }
 int ft_search_line(char *stach)
 {
-	char	c;
-	int		i;
+	unsigned long		i;
 	
-	c = '\n'
+	if (!stach)
+		return (0);
 	i = 0;
-	while (stach [i] != '\n' && stach[i] != '\0')
+	while (stach[i] != '\n' && stach[i] != '\0')
 		i++;
 	if (stach[i] == '\n')
 		return (1);
 	return (0);
+}
+char	*ft_substr(char *stach, unsigned long start)
+{
+	unsigned long	ls;
+	char	*r;
+
+	ls = ft_strlen(stach) - start + 1;
+	r = malloc(ls * sizeof(char));
+	if (!r)
+		return (NULL);
+	while (stach[start] != '\0')
+	{
+		r[start] = stach[start];
+		start++;
+	}
+	r[start] = '\0';
+	return (r);
 }

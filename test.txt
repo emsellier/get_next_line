@@ -1,8 +1,10 @@
-coucou
-ceci est un test,\n, on va voir si ca fonctionne bien!!
+coucoublablabla
 
 
-test encore
-\
-
-.
+ceci est un test,\n, on va voir si ca fonctionne bien!!\n
+\n
+\n
+test encore\n
+\\n
+\n
+.\0
