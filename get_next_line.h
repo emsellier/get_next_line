@@ -6,7 +6,7 @@
 /*   By: esellier <esellier@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 15:59:02 by esellier          #+#    #+#             */
-/*   Updated: 2024/02/20 17:15:21 by esellier         ###   ########.fr       */
+/*   Updated: 2024/02/21 21:10:01 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,13 @@
 # include <unistd.h>
 # include <stdio.h>
 
-char	*get_next_line(int fd);
-char    *ft_buf_cpy(char *stach, char *buf, int readed);
-unsigned long	ft_strlen(char *stach);
-char    *ft_end_stach(char *stach);
-int ft_search_line(char *stach);
-char    *ft_substr(char *stach, unsigned long start);
+char			*get_next_line(int fd);
+char			*ft_error(char *buf, char *stach);
+char			*ft_buf_cpy(char *stach, char *buf, int readed);
+unsigned long	ft_strlen(char *stach, int line);
+char			*ft_end_stach(char **stach);
+int				ft_search_line(char *stach);
+char			*ft_substr(char *stach, unsigned long start);
+//char            *ft_check_last_line(char *stach);
 
 #endif
