@@ -6,7 +6,7 @@
 /*   By: esellier <esellier@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 15:57:11 by esellier          #+#    #+#             */
-/*   Updated: 2024/02/21 21:46:51 by esellier         ###   ########.fr       */
+/*   Updated: 2024/02/22 17:35:49 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ char	*ft_buf_cpy(char *stach, char *buf, int readed)
 	i = 0;
 	j = 0;
 	if (!readed)
-		return (ft_error(buf, stach));
+		free (stach);
 	if (stach)
 		i = ft_strlen(stach, 0);
 	tmp = malloc((readed + i + 1) * sizeof(char));
 	if (!tmp)
-		return (ft_error(buf, stach));
+		return (ft_error(buf, NULL));
 	i = 0;
 	while (stach && stach[i] != '\0')
 	{
@@ -36,8 +36,11 @@ char	*ft_buf_cpy(char *stach, char *buf, int readed)
 	while (j < readed)
 		tmp[i++] = buf[j++];
 	tmp[i] = '\0';
+	if (readed == 0)
+		return (stach);
 	if (stach)
 		free (stach);
+	//	stach = "\0";
 	return (tmp);
 }
 
@@ -59,13 +62,15 @@ unsigned long	ft_strlen(char *stach, int line)
 	return (len);
 }
 
-char	*ft_end_stach(char **stach_ptr) //--> pour pouvoir modifier la stach, il faut passer un pointeur sur stach, on traite la fin de ligne
+char	*ft_end_stach(char **stach_ptr, int readed) //--> pour pouvoir modifier la stach, il faut passer un pointeur sur stach, on traite la fin de ligne
 {
 	unsigned long	i;
 	char			*tmp;
 	char			*stach;
 
 	stach = *stach_ptr;
+	if (readed == 0)
+		return (stach);
 	tmp = malloc((ft_strlen(stach, 1) + 2) * sizeof(char)); //-->chercher le premier \n
 	if (!tmp)
 		return (ft_error(NULL, stach));
