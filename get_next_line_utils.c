@@ -6,28 +6,28 @@
 /*   By: esellier <esellier@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 15:57:11 by esellier          #+#    #+#             */
-/*   Updated: 2024/02/22 17:35:49 by esellier         ###   ########.fr       */
+/*   Updated: 2024/02/23 16:56:27 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_buf_cpy(char *stach, char *buf, int readed)
+void	ft_buf_cpy(char **stach_ptr, char *buf, int readed)
 {
 	int		i;
 	int		j;
 	char	*tmp;
+	char	*stach;
 
 	i = 0;
 	j = 0;
-	if (!readed)
-		free (stach);
-	if (stach)
-		i = ft_strlen(stach, 0);
-	tmp = malloc((readed + i + 1) * sizeof(char));
+	stach = *stach_ptr;
+	tmp = malloc((readed + ft_strlen(stach, 0) + 1) * sizeof(char));
 	if (!tmp)
-		return (ft_error(buf, NULL));
-	i = 0;
+	{
+		ft_stach_error (stach_ptr);
+		return ;
+	}
 	while (stach && stach[i] != '\0')
 	{
 		tmp[i] = stach[i];
@@ -36,17 +36,14 @@ char	*ft_buf_cpy(char *stach, char *buf, int readed)
 	while (j < readed)
 		tmp[i++] = buf[j++];
 	tmp[i] = '\0';
-	if (readed == 0)
-		return (stach);
 	if (stach)
 		free (stach);
-	//	stach = "\0";
-	return (tmp);
+	*stach_ptr = tmp;
 }
 
-unsigned long	ft_strlen(char *stach, int line)
+int	ft_strlen(char *stach, int line)
 {
-	unsigned long	len;
+	int	len;
 
 	if (!stach)
 		return (0);
@@ -62,18 +59,16 @@ unsigned long	ft_strlen(char *stach, int line)
 	return (len);
 }
 
-char	*ft_end_stach(char **stach_ptr, int readed) //--> pour pouvoir modifier la stach, il faut passer un pointeur sur stach, on traite la fin de ligne
+char	*ft_end_stach(char **stach_ptr)
 {
-	unsigned long	i;
-	char			*tmp;
-	char			*stach;
+	int		i;
+	char	*tmp;
+	char	*stach;
 
 	stach = *stach_ptr;
-	if (readed == 0)
-		return (stach);
-	tmp = malloc((ft_strlen(stach, 1) + 2) * sizeof(char)); //-->chercher le premier \n
+	tmp = malloc((ft_strlen(stach, 1) + 2) * sizeof(char));
 	if (!tmp)
-		return (ft_error(NULL, stach));
+		return (ft_stach_error(stach_ptr));
 	i = 0;
 	while (stach[i] != '\n')
 	{
@@ -82,18 +77,20 @@ char	*ft_end_stach(char **stach_ptr, int readed) //--> pour pouvoir modifier la 
 	}
 	tmp[i] = '\n';
 	tmp[i + 1] = '\0';
-	*stach_ptr = ft_substr(stach, i + 1); //--> refaire une stach avec ce qui reste de la premiere ligne
+	*stach_ptr = ft_substr(stach_ptr, i + 1);
 	if (!*stach_ptr)
 	{
 		free (tmp);
 		return (NULL);
 	}
+	if (ft_strlen(*stach_ptr, 0) == 0)
+		ft_stach_error(stach_ptr);
 	return (tmp);
 }
 
 int	ft_search_line(char *stach)
 {
-	unsigned long		i;
+	int	i;
 
 	if (!stach)
 		return (0);
@@ -105,20 +102,24 @@ int	ft_search_line(char *stach)
 	return (0);
 }
 
-char	*ft_substr(char *stach, unsigned long start) //-->  copie une string + malloc et commence a l'index start ( pour garder les reste de cas de return)
+char	*ft_substr(char **stach_ptr, int start)
 {
-	unsigned long	ls;
-	char			*r;
-	int				i;
+	char	*stach;
+	char	*new;
+	int		len;
+	int		i;
 
 	i = 0;
-	ls = ft_strlen(stach, 0) - start + 1;
-	r = malloc(ls * sizeof(char));
-	if (!r)
-		return (ft_error(NULL, stach));
+	stach = *stach_ptr;
+	if (!stach)
+		return (NULL);
+	len = ft_strlen (stach, 0) - start;
+	new = malloc((len + 1) * sizeof(char));
+	if (!new)
+		return (ft_stach_error(stach_ptr));
 	while (stach[start] != '\0')
-		r[i++] = stach[start++];
-	r[i] = '\0';
-	free (stach);
-	return (r);
+		new[i++] = stach[start++];
+	new[len] = '\0';
+	ft_stach_error(stach_ptr);
+	return (new);
 }

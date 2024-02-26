@@ -6,20 +6,19 @@
 /*   By: esellier <esellier@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 15:55:36 by esellier          #+#    #+#             */
-/*   Updated: 2024/02/22 17:35:49 by esellier         ###   ########.fr       */
+/*   Updated: 2024/02/23 16:55:14 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_error(char *buf, char *stach)
+char	*ft_stach_error(char **stach)
 {
-	if (buf)
-		free (buf);
-	buf = NULL;
-	if (stach)
-		free (stach);
-	stach = NULL;
+	if (*stach)
+	{
+		free (*stach);
+		*stach = NULL;
+	}
 	return (NULL);
 }
 
@@ -29,41 +28,30 @@ char	*get_next_line(int fd)
 	static char	*stach;
 	int			readed;
 
-	if (fd < 0 || BUFFER_SIZE < 1)
+	if (fd < 0 || fd > 256 || BUFFER_SIZE < 1)
 		return (NULL);
-	readed = 0;
-	if (ft_search_line(stach)) //--> ici car can on rappelle la fonction dans le main on checke d'abord si c'est une fin de ligne.
-		return (ft_end_stach(&stach, readed));
-	while (1)
+	if (ft_search_line(stach))
+		return (ft_end_stach(&stach));
+	buf = malloc(BUFFER_SIZE * sizeof(char));
+	if (!buf)
+		return (ft_stach_error(&stach));
+	readed = read(fd, buf, BUFFER_SIZE);
+	if (readed > 0)
 	{
-		buf = malloc(BUFFER_SIZE * sizeof(char));
-		if (!buf)
-			return (NULL);
-		readed = read(fd, buf, BUFFER_SIZE);
-		if (readed < 0)
-			return (ft_error(buf, stach));
-		stach = malloc(ft_buf_cpy(stach, buf, readed) * sizeof (char));
+		ft_buf_cpy(&stach, buf, readed);
 		if (!stach)
 			return (NULL);
-		free (buf);
-		//buf = NULL;
-		//if (ft_search_line(stach)) //--> retourner la ligne + \n ou derniere ligne
-		//	return (ft_end_stach(&stach, readed));
-		if (!readed)
-		{
-			if (!stach)
-				return (NULL);
-			buf = ft_end_stach(&stach, readed);
-			if (!buf)
-				return (ft_error(buf, stach));
-			stach = NULL; //--> pour ne pas avoir de boucle infini;
-			return (buf);// --> j'utilise "buf" juste pour ne pas recreer une autre variable mais ce n'est pas le buffer 
-		}
+		return (free (buf), get_next_line(fd));
 	}
-	return (NULL);
+	free (buf);
+	if (readed < 0)
+		return (ft_stach_error(&stach));
+	if (!stach || ft_strlen(stach, 0) == 0)
+		return (ft_stach_error(&stach));
+	return (ft_substr(&stach, 0));
 }
 
-#include <fcntl.h>
+/*#include <fcntl.h>
 
 int	main()
 {
@@ -75,9 +63,9 @@ int	main()
 	{
 		line = get_next_line(fd);
 		if(line == NULL)
-			break;
+			return (0);
 		printf("%s", line);
 		free(line);
 	}
 	return (0);
-}
+}*/
